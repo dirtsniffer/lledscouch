@@ -16,7 +16,6 @@
 // If you don't define this, the app will initially operate offline; to make it sync the user will
 // have to go to the config view and enter the URL of a remote database.
 //#define kDefaultSyncDbURL @"http://sync.couchbasecloud.com/grocery-sync/"
-//#define kDefaultSyncDbURL @"http://tribute.hdrinnovation.com:5984/_utils/database.html?lledscouch"
 #define kDefaultSyncDbURL @"http://tribute.hdrinnovation.com:5984/lledscouch"
 
 @implementation DemoAppDelegate

@@ -1,11 +1,11 @@
 #import "RootViewController.h"
 #import "ConfigViewController.h"
 #import "DemoAppDelegate.h"
-
+//#import <CoreLocation/CoreLocation.h>//gps
 #import <Couchbaselite/CouchbaseLite.h>
 
-
-@interface RootViewController ()
+//@interface MyLocationViewController : UIViewController <CLLocationMana
+@interface RootViewController ()//: UIRootViewController <CLLocationManagerDelegate>)//()
 @property(nonatomic, strong)CBLDatabase *database;
 @property(nonatomic, strong)NSURL* remoteSyncURL;
 - (void)updateSyncURL;
@@ -16,7 +16,9 @@
 @end
 
 
-@implementation RootViewController
+@implementation RootViewController{
+    CLLocationManager *locationManager;
+}
 
 
 @synthesize dataSource;
@@ -30,6 +32,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+     locationManager = [[CLLocationManager alloc] init];//location manager instance
 
     UIBarButtonItem* deleteButton = [[UIBarButtonItem alloc] initWithTitle: @"Clean"
                                                             style:UIBarButtonItemStylePlain
@@ -232,20 +235,78 @@
         return;
     }
     addItemTextField.text = nil;
-
+    //double X = -123.55;
+    //double Y = 45.22;
+   // NSString *strX = @"-123.55";
+    
+    //turn on the GPS
+    locationManager.delegate = self;
+    locationManager.desiredAccuracy = kCLLocationAccuracyBest;//set the accuracy
+    [locationManager startUpdatingLocation];
+    
+   // NSNumber *X = @-121.3333333; //[NSNumber numberWithDouble:-123.2222222];
+   //NSNumber *Y = @44.2222222;
     // Create the new document's properties:
-	NSDictionary *document = @{@"text":       text,
-                               @"check":      @NO,
-                               @"created_at": [CBLJSON JSONObjectWithDate: [NSDate date]]};
+	//NSDictionary *document = @{@"text":       text,
+    //                           @"check":      @NO,
+    //                           @"X": X,
+    //                           @"Y": Y,
+    //                           @"created_at": [CBLJSON JSONObjectWithDate: [NSDate date]]};
     
     // Save the document:
-    CBLDocument* doc = [database createDocument];
-    NSError* error;
-    if (![doc putProperties: document error: &error]) {
-        [self showErrorAlert: @"Couldn't save new item" forError: error];
-    }
+    //CBLDocument* doc = [database createDocument];
+   // NSError* error;
+    //if (![doc putProperties: document error: &error]) {
+    //    [self showErrorAlert: @"Couldn't save new item" forError: error];
+    //}
+    
+}
+#pragma mark - CLLocationManagerDelegate
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+{
+    NSLog(@"didFailWithError: %@", error);
+    UIAlertView *errorAlert = [[UIAlertView alloc]
+                               initWithTitle:@"Error" message:@"Failed to Get Your Location" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [errorAlert show];
 }
 
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+{
+    NSLog(@"didUpdateToLocation: %@", newLocation);
+    CLLocation *currentLocation = newLocation;
+    
+    if (currentLocation != nil) {  //test for GPS location recieved if so push it to the server
+       // NSNumber *X = [NSNumber numberWithDouble:currentLocation.coordinate.longitude];//@-121.3333333; //[NSNumber numberWithDouble:-123.2222222];
+       // NSNumber *Y = [NSNumber numberWithDouble:currentLocation.coordinate.latitude];//@44.2222222;
+        // Create the new document's properties:
+
+        NSDictionary *document = @{@"deviseid":       @"LledsiPhone",//text,
+                                   @"X": [NSNumber numberWithDouble:currentLocation.coordinate.longitude],
+                                   @"Y": [NSNumber numberWithDouble:currentLocation.coordinate.latitude],
+                                   @"speed":      [NSNumber numberWithDouble:currentLocation.speed],
+                                   @"verticalaccuracy":      [NSNumber numberWithDouble:currentLocation.verticalAccuracy],
+                                   @"heading":      [NSNumber numberWithDouble:currentLocation.course],
+                                   @"text":      currentLocation.description,
+                                   @"horizontalaccuracy":      [NSNumber numberWithDouble:currentLocation.horizontalAccuracy],
+                                   @"altitude":      [NSNumber numberWithDouble:currentLocation.altitude],
+                                   @"created_at": [CBLJSON JSONObjectWithDate: [NSDate date]]};
+        
+        // Save the document:
+        CBLDocument* doc = [database createDocument];
+        NSError* error;
+        if (![doc putProperties: document error: &error]) {
+            [self showErrorAlert: @"Couldn't save new item" forError: error];
+        }
+        
+        //longitudeLabel.text = [NSString stringWithFormat:@"%.8f", currentLocation.coordinate.longitude];
+        //latitudeLabel.text = [NSString stringWithFormat:@"%.8f", currentLocation.coordinate.latitude];
+    }
+    
+    // Stop Location Manager
+    [locationManager stopUpdatingLocation];
+
+}
 
 #pragma mark - SYNC:
 

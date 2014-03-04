@@ -1,11 +1,12 @@
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>//gps
 #import <Couchbaselite/CBLUITableSource.h> // NOTE: If this import fails, make sure you have copied
 // (or symlinked) CouchbaseLite.framework into the "Frameworks" subdirectory, as per the README.
 @class CBLDatabase, CBLReplication;
 
 
-@interface RootViewController : UIViewController <CBLUITableDelegate, UITextFieldDelegate>
+@interface RootViewController : UIViewController <CBLUITableDelegate, UITextFieldDelegate, CLLocationManagerDelegate>
 {
     CBLDatabase *database;
     NSURL* remoteSyncURL;
