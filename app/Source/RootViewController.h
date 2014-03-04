@@ -5,7 +5,6 @@
 // (or symlinked) CouchbaseLite.framework into the "Frameworks" subdirectory, as per the README.
 @class CBLDatabase, CBLReplication;
 
-
 @interface RootViewController : UIViewController <CBLUITableDelegate, UITextFieldDelegate, CLLocationManagerDelegate>
 {
     CBLDatabase *database;
@@ -13,7 +12,7 @@
     CBLReplication* _pull;
     CBLReplication* _push;
     NSError* _syncError;
-    
+
     UITableView *tableView;
     IBOutlet UIProgressView *progress;
     BOOL showingSyncButton;
@@ -21,12 +20,19 @@
     IBOutlet UIImageView *addItemBackground;
 }
 
+@property (weak, nonatomic) IBOutlet UILabel *Label;
 @property(nonatomic, strong) IBOutlet UITableView *tableView;
 @property(nonatomic, strong) IBOutlet CBLUITableSource* dataSource;
+
 
 -(void)useDatabase:(CBLDatabase*)theDatabase;
 
 - (IBAction)configureSync:(id)sender;
 - (IBAction) deleteCheckedItems:(id)sender;
+
+//switch on and off
+@property (strong, nonatomic) IBOutlet UISwitch *soundSwitch;
+- (IBAction)saveSwitchState:(id)sender;
+
 
 @end

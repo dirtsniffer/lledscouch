@@ -1,11 +1,18 @@
+//todo
+//when the app goes in to backgound mode it snaps . db connection error
+//The timer never stops.
+//Add a map that reads a couchDB
+    //Create a view for xy data
+    //request the json
+    //map it
+
 #import "RootViewController.h"
 #import "ConfigViewController.h"
 #import "DemoAppDelegate.h"
-//#import <CoreLocation/CoreLocation.h>//gps
 #import <Couchbaselite/CouchbaseLite.h>
 
-//@interface MyLocationViewController : UIViewController <CLLocationMana
-@interface RootViewController ()//: UIRootViewController <CLLocationManagerDelegate>)//()
+
+@interface RootViewController ()
 @property(nonatomic, strong)CBLDatabase *database;
 @property(nonatomic, strong)NSURL* remoteSyncURL;
 - (void)updateSyncURL;
@@ -13,13 +20,13 @@
 - (void)showSyncStatus;
 - (IBAction)configureSync:(id)sender;
 - (void)forgetSync;
+
 @end
 
 
 @implementation RootViewController{
     CLLocationManager *locationManager;
 }
-
 
 @synthesize dataSource;
 @synthesize database;
@@ -32,7 +39,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-     locationManager = [[CLLocationManager alloc] init];//location manager instance
+    
+    //gps switch
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    self.soundSwitch.on = [defaults boolForKey:@"SwitchState"];
+    
+     //locationManager = [[CLLocationManager alloc] init];//location manager instance
 
     UIBarButtonItem* deleteButton = [[UIBarButtonItem alloc] initWithTitle: @"Clean"
                                                             style:UIBarButtonItemStylePlain
@@ -99,6 +111,8 @@
         }
     })];
 }
+
+
 
 
 - (void)showErrorAlert: (NSString*)message forError: (NSError*)error {
@@ -175,7 +189,7 @@
     NSMutableArray* checked = [NSMutableArray array];
     for (CBLQueryRow* row in self.dataSource.rows) {
         CBLDocument* doc = row.document;
-        if ([doc[@"check"] boolValue])       // you can get properties with [], as in NSDictionaries
+        //if ([doc[@"check"] boolValue]) //get only checked      // you can get properties with [], as in NSDictionaries
             [checked addObject: doc];
     }
     return checked;
@@ -235,31 +249,25 @@
         return;
     }
     addItemTextField.text = nil;
-    //double X = -123.55;
-    //double Y = 45.22;
-   // NSString *strX = @"-123.55";
     
-    //turn on the GPS
+//todo... loop this with a timer
+    
+    //turn on the GPS and log a point or 2.
+ 
     locationManager.delegate = self;
     locationManager.desiredAccuracy = kCLLocationAccuracyBest;//set the accuracy
     [locationManager startUpdatingLocation];
     
-   // NSNumber *X = @-121.3333333; //[NSNumber numberWithDouble:-123.2222222];
-   //NSNumber *Y = @44.2222222;
     // Create the new document's properties:
-	//NSDictionary *document = @{@"text":       text,
-    //                           @"check":      @NO,
-    //                           @"X": X,
-    //                           @"Y": Y,
-    //                           @"created_at": [CBLJSON JSONObjectWithDate: [NSDate date]]};
+	NSDictionary *document = @{@"text":       text,
+                               @"created_at": [CBLJSON JSONObjectWithDate: [NSDate date]]};
     
     // Save the document:
-    //CBLDocument* doc = [database createDocument];
-   // NSError* error;
-    //if (![doc putProperties: document error: &error]) {
-    //    [self showErrorAlert: @"Couldn't save new item" forError: error];
-    //}
-    
+    CBLDocument* doc = [database createDocument];
+    NSError* error;
+    if (![doc putProperties: document error: &error]) {
+        [self showErrorAlert: @"Couldn't save new item" forError: error];
+    }
 }
 #pragma mark - CLLocationManagerDelegate
 
@@ -276,21 +284,19 @@
     NSLog(@"didUpdateToLocation: %@", newLocation);
     CLLocation *currentLocation = newLocation;
     
-    if (currentLocation != nil) {  //test for GPS location recieved if so push it to the server
-       // NSNumber *X = [NSNumber numberWithDouble:currentLocation.coordinate.longitude];//@-121.3333333; //[NSNumber numberWithDouble:-123.2222222];
-       // NSNumber *Y = [NSNumber numberWithDouble:currentLocation.coordinate.latitude];//@44.2222222;
-        // Create the new document's properties:
-
-        NSDictionary *document = @{@"deviseid":       @"LledsiPhone",//text,
+    if (currentLocation != nil) {  //test for GPS location recieved, if so push it to the server
+       
+        NSDictionary *document = @{@"text":       @"LledsiPhone",//text,
                                    @"X": [NSNumber numberWithDouble:currentLocation.coordinate.longitude],
                                    @"Y": [NSNumber numberWithDouble:currentLocation.coordinate.latitude],
                                    @"speed":      [NSNumber numberWithDouble:currentLocation.speed],
                                    @"verticalaccuracy":      [NSNumber numberWithDouble:currentLocation.verticalAccuracy],
                                    @"heading":      [NSNumber numberWithDouble:currentLocation.course],
-                                   @"text":      currentLocation.description,
+                                   @"desc":      currentLocation.description,
                                    @"horizontalaccuracy":      [NSNumber numberWithDouble:currentLocation.horizontalAccuracy],
                                    @"altitude":      [NSNumber numberWithDouble:currentLocation.altitude],
-                                   @"created_at": [CBLJSON JSONObjectWithDate: [NSDate date]]};
+                                   @"created_at": [CBLJSON JSONObjectWithDate: [NSDate date]]
+                                  };
         
         // Save the document:
         CBLDocument* doc = [database createDocument];
@@ -305,8 +311,72 @@
     
     // Stop Location Manager
     [locationManager stopUpdatingLocation];
+    
 
 }
+
+
+//- (IBAction)startTracking:(id)sender {
+    
+//    NSTimer *aTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(aTime) userInfo:nil repeats:YES];
+ //   aTimer=nil;
+//}
+
+- (IBAction)saveSwitchState:(id)sender
+{
+    NSTimer *aTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(aTime) userInfo:nil repeats:YES];
+    aTimer=nil;
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    if ([self.soundSwitch isOn])
+    {
+        [defaults setBool:YES forKey:@"SwitchState"];
+        [defaults synchronize];
+        NSLog(@"Data Saved GPS ON");
+        locationManager = [[CLLocationManager alloc] init];//location manager instance
+
+        
+    }
+    else
+    {
+        [defaults setBool:NO forKey:@"SwitchState"];
+        [defaults synchronize];
+        NSLog(@"Data Saved GPS OFF");
+        // Stop Location Manager
+        locationManager =nil;
+        aTimer =nil;
+        //todo I need to turn the timer OFF!!!!  It is still running
+    }
+}
+-(void)aTime
+{
+    NSUserDefaults *standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    id obj = [standardUserDefaults objectForKey:@"TimerValue"];
+    int i = 0;
+    
+    if(obj != nil)
+        {
+            i = [obj intValue];
+        }
+    
+    _Label.text = [NSString stringWithFormat:@"%d",i];
+    //turn on the GPS and log a point or 2.
+    locationManager.delegate = self;
+    locationManager.desiredAccuracy = kCLLocationAccuracyBest;//set the accuracy
+    [locationManager startUpdatingLocation];
+    
+    i++;
+    
+    [standardUserDefaults setObject:[NSNumber numberWithInt:i] forKey:@"TimerValue"];
+    [standardUserDefaults synchronize];
+
+    BOOL SwitchState = [standardUserDefaults objectForKey:@"SwitchState"];
+    if (SwitchState == false) {
+        return;
+    }
+}
+
 
 #pragma mark - SYNC:
 
