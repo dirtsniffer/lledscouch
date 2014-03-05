@@ -85,7 +85,7 @@
     }) version: @"1.0"];
     
     CBLQuery *querybydate = [[database viewNamed: @"byDate"] createQuery];
-    querybydate.limit = 10;
+    querybydate.limit = 100;
     querybydate.descending = YES;
     
     NSError *error;
