@@ -74,6 +74,32 @@
 
     // Configure sync if necessary:
     [self updateSyncURL];
+    
+//Creating a View to get all xy data and ID
+    CBLView* view = [database viewNamed: @"byDate"];
+    
+    [view setMapBlock: MAPBLOCK({
+        id date = [doc objectForKey: @"created_at"];
+        if (date) emit(date, doc);
+    }) version: @"1.0"];
+    
+    CBLQuery *querybydate = [[database viewNamed: @"byDate"] createQuery];
+    querybydate.limit = 10;
+    querybydate.descending = YES;
+    
+    NSError *error;
+    CBLQueryEnumerator *rowEnum = [querybydate run: &error];
+    for (CBLQueryRow* row in rowEnum) {
+        CBLDocument *document = row.document;
+        NSNumber *X = document[@"X"];
+        NSLog(@"X = %@", X);
+        NSNumber *Y = document[@"Y"];
+        NSLog(@"Y = %@", Y);
+        NSString * ID= document[@"created_at"];
+        NSLog(@"DeviseID = %@", ID);
+    }
+//END Creating a View to get all xy data and ID
+    
 }
 
 
@@ -250,10 +276,7 @@
     }
     addItemTextField.text = nil;
     
-//todo... loop this with a timer
-    
     //turn on the GPS and log a point or 2.
- 
     locationManager.delegate = self;
     locationManager.desiredAccuracy = kCLLocationAccuracyBest;//set the accuracy
     [locationManager startUpdatingLocation];
@@ -311,7 +334,7 @@
     
     // Stop Location Manager
     [locationManager stopUpdatingLocation];
-    
+   
 
 }
 
