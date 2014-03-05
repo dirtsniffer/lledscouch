@@ -39,6 +39,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    //self.mapView.delegate = self;
     
     //gps switch
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -91,12 +92,32 @@
     CBLQueryEnumerator *rowEnum = [querybydate run: &error];
     for (CBLQueryRow* row in rowEnum) {
         CBLDocument *document = row.document;
-        NSNumber *X = document[@"X"];
-        NSLog(@"X = %@", X);
-        NSNumber *Y = document[@"Y"];
-        NSLog(@"Y = %@", Y);
-        NSString * ID= document[@"created_at"];
+        double X = [document[@"X"] doubleValue];
+        NSLog(@"X = %f", X);
+        double Y = [document[@"Y"] doubleValue];
+        NSLog(@"Y = %f", Y);
+        NSString * ID= document[@"text"];
         NSLog(@"DeviseID = %@", ID);
+        NSString * time= document[@"created_at"];
+        NSLog(@"DeviseID = %@", time);
+        
+        
+        //add the point to the map
+       // MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(userLocation.coordinate, 800, 800);
+       // [self.mapView setRegion:[self.mapView regionThatFits:region] animated:YES];
+        
+        // Add an annotation
+        CLLocationCoordinate2D coordinate;
+        coordinate.latitude = Y;
+        coordinate.longitude = X;
+        MKPointAnnotation *point = [[MKPointAnnotation alloc] init];
+        point.coordinate = coordinate;
+        point.title = ID;
+        point.subtitle = time;
+        
+        [self.mapView addAnnotation:point];
+        
+        
     }
 //END Creating a View to get all xy data and ID
     
@@ -347,7 +368,7 @@
 
 - (IBAction)saveSwitchState:(id)sender
 {
-    NSTimer *aTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(aTime) userInfo:nil repeats:YES];
+    NSTimer *aTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(aTime) userInfo:nil repeats:YES];
     aTimer=nil;
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
