@@ -3,6 +3,9 @@
 #import <CoreLocation/CoreLocation.h>//gps
 #import <Couchbaselite/CBLUITableSource.h> // NOTE: If this import fails, make sure you have copied
 // (or symlinked) CouchbaseLite.framework into the "Frameworks" subdirectory, as per the README.
+#import <MapKit/MapKit.h>
+
+
 @class CBLDatabase, CBLReplication;
 
 @interface RootViewController : UIViewController <CBLUITableDelegate, UITextFieldDelegate, CLLocationManagerDelegate>
@@ -23,7 +26,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *Label;
 @property(nonatomic, strong) IBOutlet UITableView *tableView;
 @property(nonatomic, strong) IBOutlet CBLUITableSource* dataSource;
-
+@property (strong, nonatomic) IBOutlet MKMapView *mapView;
 
 -(void)useDatabase:(CBLDatabase*)theDatabase;
 
