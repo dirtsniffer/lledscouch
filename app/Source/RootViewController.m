@@ -1,10 +1,10 @@
-//todo
-//when the app goes in to backgound mode it snaps . db connection error
-//The timer never stops.
-//Add a map that reads a couchDB
-    //Create a view for xy data
-    //request the json
-    //map it
+//TODO
+    //when the app goes in to backgound mode it snaps . db connection error
+    //The timer never stops.
+    //Map issues
+        //1 marker type for all
+        //only reads data on load.  The data needs to load when there is a sync.  I might be able to use KVO BUT??
+        //Zoom to all data... http://stackoverflow.com/questions/2699171/how-do-i-add-custom-pins-to-the-iphone-mapkit
 
 #import "RootViewController.h"
 #import "ConfigViewController.h"
