@@ -368,7 +368,7 @@
 
 - (IBAction)saveSwitchState:(id)sender
 {
-    NSTimer *aTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(aTime) userInfo:nil repeats:YES];
+    NSTimer *aTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(aTime) userInfo:nil repeats:YES];
     aTimer=nil;
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -415,10 +415,10 @@
     [standardUserDefaults setObject:[NSNumber numberWithInt:i] forKey:@"TimerValue"];
     [standardUserDefaults synchronize];
 
-    BOOL SwitchState = [standardUserDefaults objectForKey:@"SwitchState"];
-    if (SwitchState == false) {
-        return;
-    }
+    //BOOL SwitchState =[standardUserDefaults objectForKey:@"SwitchState"];
+   // if (SwitchState == false) {
+   //     return;
+    //}
 }
 
 

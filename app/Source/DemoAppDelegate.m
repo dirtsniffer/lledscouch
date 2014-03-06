@@ -17,7 +17,7 @@
 // have to go to the config view and enter the URL of a remote database.
 //#define kDefaultSyncDbURL @"http://sync.couchbasecloud.com/grocery-sync/"
 #define kDefaultSyncDbURL @"http://tribute.hdrinnovation.com:5984/lledscouch"
-
+//#define kDefaultSyncDbURL @"http://lledmaps.iriscouch.com/lledscouch"
 @implementation DemoAppDelegate
 
 @synthesize window;
